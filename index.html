@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2D Animation Studio</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-lines">
+  <span></span><span></span><span></span><span></span>
+</div>
+
+<nav>
+  <div>
+    <img src="images/logoyellow.png" width="150px">
+  </div>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#storyboard">Storyboard</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header>
+  <div>
+    <div>
+    <img src="images/logoyellow.png">
+  </div>
+    <h1><span>VILAGE</span> Pixar Studio</h1>
+    <p>Storytelling • Illustration • Frame-by-Frame Animation</p>
+  </div>
+</header>
+
+<section id="about" class="about">
+  <h2>About Us</h2>
+  <p>
+    We are a creative 2D animation studio focused on storytelling, character
+    design, illustration, and storyboard-driven animation. From concept to
+    final frames, we bring ideas to life with expressive visuals.
+  </p>
+</section>
+
+<section id="storyboard">
+  <h2>Storyboard Gallery</h2>
+  <div class="storyboard">
+    <div class="story-card">
+      <img src="https://picsum.photos/400/300?10" />
+      <h4>Scene 01</h4>
+      <p>Opening shot – character introduction</p>
+    </div>
+    <div class="story-card">
+      <img src="https://picsum.photos/400/300?11" />
+      <h4>Scene 02</h4>
+      <p>Conflict development & motion planning</p>
+    </div>
+    <div class="story-card">
+      <img src="https://picsum.photos/400/300?12" />
+      <h4>Scene 03</h4>
+      <p>Climax pose-to-pose frames</p>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <h2>Animation Frames</h2>
+  <div class="gallery">
+    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?1')">
+      <img src="https://picsum.photos/400/300?1" />
+    </div>
+    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?2')">
+      <img src="https://picsum.photos/400/300?2" />
+    </div>
+    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?3')">
+      <img src="https://picsum.photos/400/300?3" />
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>Contact Us</h2>
+  <form>
+    <input type="text" placeholder="Name" required />
+    <input type="email" placeholder="Email" required />
+    <textarea rows="5" placeholder="Your story idea..."></textarea>
+    <button>Send Message</button>
+  </form>
+</section>
+
+<footer>© 2025 Vilage Pixar Studio</footer>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" />
+</div>
+
+<script>
+  function openLightbox(src){
+    document.getElementById('lightboxImg').src=src
+    document.getElementById('lightbox').classList.add('active')
+  }
+  function closeLightbox(){
+    document.getElementById('lightbox').classList.remove('active')
+  }
+</script>
+
+</body>
+</html>
