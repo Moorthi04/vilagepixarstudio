@@ -5,101 +5,255 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2D Animation Studio</title>
 
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&display=swap" rel="stylesheet">
 
- <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --primary:#efdc51;
+      --dark:#323230;
+    }
+
+    body{
+      font-family:'Nunito',sans-serif;
+      background:var(--dark);
+      color:var(--primary);
+      overflow-x:hidden
+    }
+
+    /* BACKGROUND LINES */
+    .bg-lines span{
+      position:absolute;width:2px;height:120px;background:rgba(255,255,255,.08);
+      animation:float 8s infinite linear
+    }
+    .bg-lines span:nth-child(1){left:10%}
+    .bg-lines span:nth-child(2){left:30%;animation-delay:2s}
+    .bg-lines span:nth-child(3){left:55%;animation-delay:4s}
+    .bg-lines span:nth-child(4){left:80%;animation-delay:6s}
+    @keyframes float{from{top:110%}to{top:-20%}}
+
+    /* NAVBAR */
+    .navbar{
+      backdrop-filter:blur(12px);
+      background:rgba(0,0,0,.4)
+    }
+
+    /* HERO */
+    header{
+      min-height:100vh;
+      display:flex;align-items:center;text-align:center
+    }
+    header h1{font-size:4rem;font-weight:800}
+    header span{color:var(--primary)}
+
+    /* SECTIONS */
+    section{padding:100px 0}
+    h2{text-align:center;font-size:2.6rem;margin-bottom:50px}
+
+    /* STORYBOARD */
+    .story-card{
+      background:#161a35;border-radius:22px;padding:20px;height:100%;
+      transition:.4s
+    }
+    .story-card:hover{transform:translateY(-10px)}
+    .story-card img{border-radius:16px}
+
+    /* GALLERY */
+    .gallery-item{
+      height:220px;border-radius:20px;overflow:hidden;cursor:pointer;
+      transition:.4s;background:#111
+    }
+    .gallery-item img{width:100%;height:100%;object-fit:cover}
+    .gallery-item:hover{transform:scale(1.05)}
+
+    /* LIGHTBOX */
+    .lightbox{
+      position:fixed;inset:0;background:rgba(0,0,0,.9);
+      display:none;align-items:center;justify-content:center;z-index:2000
+    }
+    .lightbox.active{display:flex}
+    .lightbox img{max-width:90%;max-height:85vh;border-radius:18px}
+
+    footer{color:#aaa}
+  </style>
 </head>
 <body>
 
-<!-- BACKGROUND -->
 <div class="bg-lines">
   <span></span><span></span><span></span><span></span>
 </div>
 
-<nav>
-  <div>
-    <img src="images/logoyellow.png" width="150px">
+<!-- NAVBAR (3 SECTIONS) -->
+<nav class="navbar fixed-top" style="background:#323230">
+  <div class="container d-flex align-items-center justify-content-between">
+
+    <!-- LEFT -->
+    <div class="d-flex align-items-center gap-2 fw-bold" style="color:#efdc51">
+  <img src="images/logoyellow.png" alt="Village Pixar Studio Logo" style="height:36px;width:auto">
+  <span>VILAGE PIXAR STUDIO</span>
+</div>
+
+    <!-- CENTER -->
+    <ul class="nav d-none d-md-flex gap-4">
+      <li><a href="#about" class="nav-link" style="color:#efdc51">About</a></li>
+      <li><a href="#storyboard" class="nav-link" style="color:#efdc51">Storyboard</a></li>
+      <li><a href="#characters" class="nav-link" style="color:#efdc51">Characters</a></li>
+      <li><a href="#gallery" class="nav-link" style="color:#efdc51">Gallery</a></li>
+      <li><a href="#contact" class="nav-link" style="color:#efdc51">Contact</a></li>
+    </ul>
+
+    <!-- RIGHT -->
+    <a href="draw.html" class="btn fw-bold d-none d-md-block" style="background:#efdc51;color:#323230">Start Project</a>
+
+    <!-- MOBILE TOGGLE -->
+    <button class="btn d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" style="color:#efdc51">☰</button>
   </div>
-  <ul>
-    <li><a href="#about">About</a></li>
-    <li><a href="#storyboard">Storyboard</a></li>
-    <li><a href="#gallery">Gallery</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
 </nav>
 
-<header>
-  <div>
-    <div>
-    <img src="images/logoyellow.png">
+<!-- MOBILE SIDEBAR -->
+<div class="offcanvas offcanvas-start" id="mobileSidebar" style="background:var(--dark);color:var(--primary)">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">2D Motion</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
   </div>
-    <h1><span>VILAGE</span> Pixar Studio</h1>
-    <p>Storytelling • Illustration • Frame-by-Frame Animation</p>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column gap-3">
+      <li><a href="#about" class="nav-link text-warning" data-bs-dismiss="offcanvas">About</a></li>
+      <li><a href="#storyboard" class="nav-link text-warning" data-bs-dismiss="offcanvas">Storyboard</a></li>
+      <li><a href="#gallery" class="nav-link text-warning" data-bs-dismiss="offcanvas">Gallery</a></li>
+      <li><a href="#contact" class="nav-link text-warning" data-bs-dismiss="offcanvas">Contact</a></li>
+    </ul>
   </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="flex-grow-1">
+<!-- HERO (UPDATED DESIGN) -->
+<!-- HERO : STUDIO‑STYLE CINEMATIC -->
+<header class="hero-section position-relative overflow-hidden d-flex align-items-center">
+
+  <!-- CINEMATIC BACKGROUND -->
+  <div class="cinematic-bg"></div>
+
+  <!-- CONTENT -->
+  <div class="container position-relative z-2 text-center">
+    <p class="text-uppercase tracking-wide mb-2" style="color:#efdc51;letter-spacing:4px">2D Animation Studio</p>
+
+    <h1 class="display-3 fw-bold mb-3">
+      Crafting <span style="color:#efdc51">Stories</span><br class="d-none d-md-block" />Frame by Frame
+    </h1>
+
+    <p class="lead text-light col-lg-8 mx-auto mb-4">
+      VILAGE PIXAR STUDIO specializes in storyboard-driven animation, character design,
+      and expressive cinematic storytelling.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3">
+      <a href="#storyboard" class="btn px-4 py-2 fw-bold" style="background:#efdc51;color:#323230">Watch Animatic</a>
+      <a href="#gallery" class="btn btn-outline-warning px-4 py-2 fw-bold">View Frames</a>
+    </div>
+  </div>
+
+  <!-- CINEMATIC OVERLAYS -->
+  <div class="film-grain"></div>
+  <div class="vignette"></div>
 </header>
 
-<section id="about" class="about">
+<style>
+.hero-section{min-height:100vh;background:#323230}
+.cinematic-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(120deg,rgba(239,220,81,.12),transparent 60%),
+             radial-gradient(circle at 80% 20%,rgba(239,220,81,.15),transparent 40%);
+}
+.film-grain{
+  position:absolute;inset:0;
+  background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.04"/></svg>');
+  pointer-events:none
+}
+.vignette{
+  position:absolute;inset:0;
+  box-shadow:inset 0 0 180px rgba(0,0,0,.65);
+  pointer-events:none
+}
+</style>
+
+<!-- STICKY MOBILE CTA -->
+<a href="draw.html" class="d-md-none position-fixed bottom-0 start-0 end-0 text-center py-3 fw-bold" style="background:#efdc51;color:#323230;z-index:1500">Start Your Animation Project</a>
+
+<!-- ABOUT -->
+<section id="about" class="container">
   <h2>About Us</h2>
-  <p>
-    We are a creative 2D animation studio focused on storytelling, character
-    design, illustration, and storyboard-driven animation. From concept to
-    final frames, we bring ideas to life with expressive visuals.
+  <p class="text-center text-light col-lg-8 mx-auto">
+    We are a creative 2D animation studio focused on storytelling, character design,
+    illustration, and storyboard-driven animation.
   </p>
 </section>
 
-<section id="storyboard">
-  <h2>Storyboard Gallery</h2>
-  <div class="storyboard">
-    <div class="story-card">
-      <img src="https://picsum.photos/400/300?10" />
-      <h4>Scene 01</h4>
-      <p>Opening shot – character introduction</p>
-    </div>
-    <div class="story-card">
-      <img src="https://picsum.photos/400/300?11" />
-      <h4>Scene 02</h4>
-      <p>Conflict development & motion planning</p>
-    </div>
-    <div class="story-card">
-      <img src="https://picsum.photos/400/300?12" />
-      <h4>Scene 03</h4>
-      <p>Climax pose-to-pose frames</p>
-    </div>
+<!-- STORYBOARD / ANIMATIC -->
+<section id="storyboard" class="container">
+  <h2>Storyboard Animatic</h2>
+  <div class="text-center mb-4">
+    <img id="animaticFrame" src="https://picsum.photos/800/450?101" class="img-fluid rounded" />
+  </div>
+  <input type="range" class="form-range" min="1" max="5" value="1" oninput="changeFrame(this.value)">
+  <p class="text-center text-light mt-2">Drag to preview frame-by-frame storyboard</p>
+</section>
+
+<!-- CHARACTER DESIGN -->
+<section id="characters" class="container">
+  <h2>Character Design</h2>
+  <div class="row g-4">
+    <div class="col-md-4"><img class="img-fluid rounded" src="https://picsum.photos/400/500?201"></div>
+    <div class="col-md-4"><img class="img-fluid rounded" src="https://picsum.photos/400/500?202"></div>
+    <div class="col-md-4"><img class="img-fluid rounded" src="https://picsum.photos/400/500?203"></div>
   </div>
 </section>
 
-<section id="gallery">
+<!-- GALLERY -->
+<section id="gallery" class="container">
   <h2>Animation Frames</h2>
-  <div class="gallery">
-    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?1')">
-      <img src="https://picsum.photos/400/300?1" />
+  <div class="row g-4">
+    <div class="col-sm-6 col-md-4">
+      <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?31')">
+        <img src="https://picsum.photos/400/300?31" />
+      </div>
     </div>
-    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?2')">
-      <img src="https://picsum.photos/400/300?2" />
+    <div class="col-sm-6 col-md-4">
+      <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?32')">
+        <img src="https://picsum.photos/400/300?32" />
+      </div>
     </div>
-    <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?3')">
-      <img src="https://picsum.photos/400/300?3" />
+    <div class="col-sm-6 col-md-4">
+      <div class="gallery-item" onclick="openLightbox('https://picsum.photos/900/600?33')">
+        <img src="https://picsum.photos/400/300?33" />
+      </div>
     </div>
   </div>
 </section>
 
-<section id="contact">
+<!-- CONTACT -->
+<section id="contact" class="container">
   <h2>Contact Us</h2>
-  <form>
-    <input type="text" placeholder="Name" required />
-    <input type="email" placeholder="Email" required />
-    <textarea rows="5" placeholder="Your story idea..."></textarea>
-    <button>Send Message</button>
+  <form class="col-lg-6 mx-auto">
+    <input class="form-control mb-3" placeholder="Name" />
+    <input class="form-control mb-3" placeholder="Email" />
+    <textarea class="form-control mb-3" rows="4" placeholder="Your story idea..."></textarea>
+    <button class="btn btn-warning w-100 fw-bold">Send Message</button>
   </form>
 </section>
 
-<footer>© 2025 Vilage Pixar Studio</footer>
+<footer class="text-center py-4">© 2025 VILAGE PIXAR STUDIO</footer>
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <img id="lightboxImg" />
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
   function openLightbox(src){
     document.getElementById('lightboxImg').src=src
@@ -108,7 +262,33 @@
   function closeLightbox(){
     document.getElementById('lightbox').classList.remove('active')
   }
+
+  /* ANIMATIC FRAMES */
+  function changeFrame(val){
+    document.getElementById('animaticFrame').src = `https://picsum.photos/800/450?10${val}`
+  }
+
+  /* GSAP MOTION */
+  gsap.from('header h1',{y:40,opacity:0,duration:1})
+  gsap.from('section',{opacity:0,y:40,stagger:.2,scrollTrigger:{trigger:'section',start:'top 80%'}})
+
+  /* CLIENT PRESENTATION MODE */
+  document.addEventListener('keydown',e=>{
+    if(e.key==='p') document.body.classList.toggle('presentation')
+  })(){
+    document.getElementById('lightbox').classList.remove('active')
+  }
 </script>
+
+  </main>
+</div>
+
+<!-- DRAW PAGE (draw.html) -->
+<!-- Create a new file named draw.html and paste below code -->
+
+<!-- ================= draw.html ================= -->
+
+<!-- =============== END draw.html =============== -->
 
 </body>
 </html>

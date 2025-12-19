@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animatic Editor – VILAGE PIXAR STUDIO</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{margin:0;background:#323230;color:#efdc51;font-family:Nunito,sans-serif}
+.editor{min-height:100vh;display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:10px;padding:10px}
+.frame{background:#fff;border:4px solid #efdc51;border-radius:18px;width:75vw;aspect-ratio:16/9;position:relative}
+canvas{width:100%;height:100%;border-radius:14px;cursor:crosshair}
+.side-toolbar{background:#323230;border:2px solid #efdc51;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px;height:fit-content;min-width:120px}
+.tool{color:#efdc51;border:1px solid #efdc51;background:none;padding:6px 12px;border-radius:10px;text-align:center;cursor:pointer}
+.tool.active{background:#efdc51;color:#323230}
+.timeline{display:flex;gap:10px;margin-top:18px;overflow-x:auto;padding:10px;flex-wrap:wrap}
+.thumb{width:90px;height:55px;border:2px solid #efdc51;border-radius:8px;cursor:pointer;opacity:.5}
+.thumb.active{opacity:1;background:#efdc51}
+.grid{position:absolute;inset:0;background:linear-gradient(rgba(0,0,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,255,.08) 1px,transparent 1px);background-size:40px 40px;display:none;pointer-events:none}
+</style>
+</head>
+<body>
+  <nav class="navbar fixed-top" style="background:#323230">
+  <div class="container d-flex align-items-center justify-content-between">
+
+    <!-- LEFT -->
+    <div class="d-flex align-items-center gap-2 fw-bold" style="color:#efdc51">
+ <img src="images/logoyellow.png" alt="Village Pixar Studio Logo" style="height:36px;width:auto">
+  <span>VILAGE PIXAR STUDIO</span>
+</div>
+
+    <!-- CENTER -->
+    <ul class="nav d-none d-md-flex gap-4">
+      <li><a href="#about" class="nav-link" style="color:#efdc51">About</a></li>
+      <li><a href="#storyboard" class="nav-link" style="color:#efdc51">Storyboard</a></li>
+      <li><a href="#characters" class="nav-link" style="color:#efdc51">Characters</a></li>
+      <li><a href="#gallery" class="nav-link" style="color:#efdc51">Gallery</a></li>
+      <li><a href="#contact" class="nav-link" style="color:#efdc51">Contact</a></li>
+    </ul>
+
+    <!-- RIGHT -->
+
+    <!-- MOBILE TOGGLE -->
+    <button class="btn d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" style="color:#efdc51">☰</button>
+  </div>
+</nav>
+<div class="editor" style="margin-top: 5rem;">
+  <div class="side-toolbar">
+    <button class="tool active" onclick="setTool('pencil',this)">✏ Pencil</button>
+    <button class="tool" onclick="setTool('brush',this)">🖌 Brush</button>
+    <button class="tool" onclick="setTool('eraser',this)">🩹 Eraser</button>
+     <label class="text-light">Size:</label>
+    <div class="size-control">
+      <button class="tool" onclick="changeSize(-1)">-</button>
+      <span id="sizeVal">2</span>
+      <button class="tool" onclick="changeSize(1)">+</button>
+    </div>
+    <div class="d-flex flex-wrap gap-1">
+      <button class="tool" style="background:#000" onclick="setColor('#000')"></button>
+      <button class="tool" style="background:#1e90ff" onclick="setColor('#1e90ff')"></button>
+      <button class="tool" style="background:#dc3545" onclick="setColor('#dc3545')"></button>
+      <button class="tool" style="background:#28a745" onclick="setColor('#28a745')"></button>
+    </div>
+    <input type="color" id="colorPicker" value="#000000" onchange="setColor(this.value)">
+    <button class="tool" onclick="undo()">↶ Undo</button>
+    <button class="tool" onclick="redo()">↷ Redo</button>
+    <button class="tool" onclick="toggleGrid()">▦ Grid</button>
+    <button class="tool" onclick="clearCanvas()">⟲ Clear</button>
+    <button class="tool" onclick="newFrame()">＋Frame</button>
+        <button class="tool" onclick="deleteFrame()">✖ Delete Frame</button>
+    <button class="tool" onclick="playAnimatic()">▶ Play</button>
+    <button class="tool" onclick="toggleOnion()">👻 Onion</button>
+     <button class="tool" onclick="exportPNG()">📷 Export PNG</button>
+  </div>
+  <div class="frame" id="frame">
+    <canvas id="canvas"></canvas>
+    <div class="grid" id="grid"></div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</div>
+<div class="d-flex justify-content-start align-items-center w-100 px-4 mt-2 text-light gap-3">
+  Scene <input id="scene" value="01" style="width:40px"> Shot <input id="shot" value="01" style="width:40px"> Frame <span id="frameNo">1</span>
+  FPS <input type="range" id="fps" min="6" max="24" value="12"> <span id="fpsVal">12</span>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+let frames=[],history=[],redoStack=[],current=0,drawing=false,tool='pencil',color='#000',fps=12,onion=true,size=2;
+
+function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;renderFrame()}
+window.addEventListener('resize',resize);
+
+function setTool(t,el){tool=t;document.querySelectorAll('.tool').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active')}
+function setColor(c){color=c;document.getElementById('colorPicker').value=c}
+function changeSize(v){size=Math.max(1,size+v);document.getElementById('sizeVal').innerText=size}
+
+canvas.addEventListener('pointerdown',e=>{drawing=true;history.push(canvas.toDataURL());redoStack=[];ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)});
+canvas.addEventListener('pointerup',()=>{drawing=false;saveFrame()});
+canvas.addEventListener('pointerleave',()=>drawing=false);
+canvas.addEventListener('pointermove',e=>{
+ if(!drawing)return;
+ ctx.lineCap='round';
+ ctx.strokeStyle=tool==='eraser'?'#fff':color;
+ ctx.lineWidth=tool==='pencil'?2:tool==='brush'?6:20;
+ ctx.lineTo(e.offsetX,e.offsetY);
+ ctx.stroke();
+ ctx.beginPath();
+ ctx.moveTo(e.offsetX,e.offsetY);
+});
+
+function undo(){if(history.length){redoStack.push(canvas.toDataURL());loadImage(history.pop())}}
+function redo(){if(redoStack.length){history.push(canvas.toDataURL());loadImage(redoStack.pop())}}
+function loadImage(src){let i=new Image();i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0,canvas.width,canvas.height)};i.src=src}
+
+function saveFrame(){frames[current]=canvas.toDataURL();localStorage.setItem('vp_frames',JSON.stringify(frames));updateTimeline()}
+function newFrame(){frames.push(null);current=frames.length-1;clearCanvas();updateTimeline()}
+function deleteFrame(){if(frames.length===0)return;frames.splice(current,1);if(current>=frames.length)current=frames.length-1;clearCanvas();renderFrame();showAllFrames();updateTimeline()}
+function clearCanvas(){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height)}
+
+function renderFrame(){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+ if(onion && frames[current-1]){let img=new Image();img.onload=()=>{ctx.globalAlpha=0.25;ctx.drawImage(img,0,0,canvas.width,canvas.height);ctx.globalAlpha=1};img.src=frames[current-1]}
+ if(frames[current]){let img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.width,canvas.height);img.src=frames[current]}}
+
+function updateTimeline(){document.getElementById('frameNo').innerText=current+1;const tl=document.getElementById('timeline');tl.innerHTML='';frames.forEach((f,i)=>{const t=document.createElement('div');t.className='thumb'+(i===current?' active':'');t.onclick=()=>{current=i;renderFrame();updateTimeline()};tl.appendChild(t)})}
+function exportPNG(){frames.forEach((f,i)=>{if(f){let a=document.createElement('a');a.href=f;a.download='frame_'+(i+1)+'.png';a.click()}})}
+function playAnimatic(){let i=0;const delay=1000/fps;const play=setInterval(()=>{if(i>=frames.length){clearInterval(play);return}current=i;renderFrame();updateTimeline();i++},delay)}
+function togglePresentation(){document.documentElement.requestFullscreen()}
+function toggleGrid(){document.getElementById('grid').classList.toggle('d-none')}
+function toggleOnion(){onion=!onion;renderFrame()}
+function exportPDF(){
+  const doc = new jsPDF();
+  frames.forEach((f, i) => {
+    if(f){doc.addImage(f,'PNG',10,10,190,107);if(i<frames.length-1) doc.addPage();}
+  });
+  doc.save('storyboard.pdf');
+}
+
+const fpsInput=document.getElementById('fps'),fpsVal=document.getElementById('fpsVal');fpsInput.oninput=()=>{fps=fpsInput.value;fpsVal.innerText=fps};
+frames=JSON.parse(localStorage.getItem('vp_frames'))||[null];resize();updateTimeline();
+
+// Load jsPDF library dynamically
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+document.body.appendChild(script);
+</script>
+</body>
+</html>
